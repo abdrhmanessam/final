@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Gift</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Reset بعض العناصر */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fff5f5;
+            color: #4a4a4a;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .section {
+            padding: 20px;
+        }
+
+        /* النص الديناميكي */
+        .dynamic-text {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #e74c3c;
+            margin-bottom: 20px;
+            animation: fade 3s infinite;
+        }
+
+        @keyframes fade {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* زر تشغيل الصوت */
+        .play-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 auto;
+            width: fit-content;
+            transition: background-color 0.3s ease;
+        }
+
+        .play-button:hover {
+            background-color: #c0392b;
+        }
+
+        .play-button i {
+            font-size: 1.2em;
+        }
+
+        .play-button p {
+            margin: 0;
+            font-size: 1em;
+        }
+
+        /* باقي الاستايلات */
+        .messages-slider, .photos-slider {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 15px;
+            padding: 10px 0;
+            scrollbar-width: none;
+        }
+
+        .messages-slider::-webkit-scrollbar, .photos-slider::-webkit-scrollbar {
+            display: none;
+        }
+
+        .message-box, .photo-box {
+            flex: 0 0 80%;
+            scroll-snap-align: start;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .message-box:hover, .photo-box:hover {
+            transform: scale(1.02);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .message-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .message-header .info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .message-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #e74c3c;
+        }
+
+        .message-header .date {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .message-box p {
+            margin: 0;
+            font-size: 1em;
+            color: #666;
+            text-align: right;
+        }
+
+        .photo-box img {
+            width: 100%;
+            height: 150px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .final-message {
+            margin-top: 30px;
+            font-size: 1.5em;
+            color: #e74c3c;
+        }
+
+        .final-message p {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #e74c3c;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .popup p {
+            margin: 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio Element -->
+    <audio id="backgroundMusic" loop>
+        <source src="love-story-156946.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Dynamic Text Section -->
+    <div class="section">
+        <div class="dynamic-text" id="dynamicText">Endless true love</div>
+        <!-- زر تشغيل الصوت -->
+        <div class="play-button" id="playButton">
+            <i class="fas fa-play"></i>
+            <p>My Message</p>
+        </div>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="section">
+        <h2>I love our feelings</h2>
+        <div class="messages-slider" id="messagesSlider">
+            <div class="message-box" dir="rtl">
+                <div class="message-header">
+                    <img src="images/photo_2025-02-15_20-31-18.jpg" alt="Person 2">
+                    <div class="info">
+                        <h3>روان</h3>
+                        <div class="date"> يناير ٢٠٢٥</div>
+                    </div>
+                </div>
+                <p>يعني راجلي حبيبي اللى مريحنيي ومخلي كل اللى نفسي فيه وعمر زعلي ما هان عليه يجي يتعب نفسه فى حاجه؟ </p>
+            </div>
+
+            <div class="message-box" dir="rtl">
+                <div class="message-header">
+                    <img src="images/photo_2025-02-15_19-54-41.jpg" alt="Person 1">
+                    <div class="info">
+                        <h3>عبدالرحمن</h3>
+                        <div class="date"> يناير ٢٠٢٥</div>
+                    </div>
+                </div>
+                <p>في شخصيتك مفيش حاجه عايز اغيرها انا بحبك زي مانتي</p>
+            </div>
+            <div class="message-box" dir="rtl">
+                <div class="message-header">
+                    <img src="images/photo_2025-02-15_20-31-18.jpg" alt="Person 2">
+                    <div class="info">
+                        <h3>رورو</h3>
+                        <div class="date"> يناير ٢٠٢٥</div>
+                    </div>
+                </div>
+                <p>انت وكل حاجه تخصك اخف عليا وعلى قلبي من الريشه وانا بحبك وعيزاك مرتاح يا حبيبي ❤️</p>
+            </div>
+            <div class="message-box" dir="rtl">
+                <div class="message-header">
+                    <img src="images/photo_2025-02-15_19-54-41.jpg" alt="Person 1">
+                    <div class="info">
+                        <h3>عبدالرحمن</h3>
+                        <div class="date">ديسمبر ٢٠٢٤</div>
+                    </div>
+                </div>
+                <p>بحق لا الا الله بحبك ومش بحب قدك ف الدنيا</p>
+            </div>
+             <!-- 2 -->
+            <div class="message-box" dir="rtl">
+                <div class="message-header">
+                    <img src="images/photo_2025-02-15_19-57-46.jpg" alt="Person 2">
+                    <div class="info">
+                        <h3>روز</h3>
+                        <div class="date"> ديسمبر ٢٠٢٤</div>
+                    </div>
+                </div>
+                <p>انا بحبك وهفضل دايما مختاراك ومختاره راحتك يا حبيبي حتي لو زعلنا من بعض مليون مرة 
+                    انت حبيبي وبابا وصاحبي وونسي وامآني </p>
+            </div>
+            <div class="message-box" dir="rtl">
+                <div class="message-header">
+                    <img src="images/photo_2025-02-15_19-54-41.jpg" alt="Person 1">
+                    <div class="info">
+                        <h3>عبدالرحمن</h3>
+                        <div class="date">يومياً </div>
+                    </div>
+                </div>
+                <p>خلي بالك من نفسك ولو عوزتي حاجه كلميني</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photos Section -->
+    <div class="section">
+        <h2> & Our Memories</h2>
+        <div class="photos-slider" id="photosSlider">
+            <div class="photo-box">
+                <img src="images/photo_2025-02-15_20-46-22.jpg" alt="Photo 1">
+                <h3>A Beautiful Day</h3>
+            </div>
+
+            <div class="photo-box">
+                <img src="images/5.jpg" alt="Photo 1">
+                <h3>Warmth feels home</h3>
+            </div>
+            <div class="photo-box">
+                <img src="images/7.jpg" alt="Photo 1">
+                <h3>Forever in memory</h3>
+            </div>
+            <div class="photo-box">
+                <img src="images/photo_2025-02-15_20-55-27.jpg" alt="Photo 1">
+                <h3>Love beyond distance</h3>
+            </div>
+            <div class="photo-box">
+                <img src="images/6.jpg" alt="Photo 1">
+                <h3>Laughter never ends</h3>
+            </div>
+
+            <div class="photo-box">
+                <img src="images/2.jpg" alt="Photo 2">
+                <h3>Whispers of love</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Message -->
+    <div class="section final-message">
+        <p><i class="fas fa-envelope" id="messageIcon"></i>For My Rose</p>
+    </div>
+
+    <!-- Popup -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <span class="close-btn" id="closeBtn">&times;</span>
+        <p>I love you so much, Rose, and no matter how much we fight or get upset with each other, I will never see my world with anyone but you. I am trying for you, and I will keep trying for you, so that you stay with me and not with anyone else. Soon, we will be together, and you will be my beautiful girl that I love in front of everyone. No matter how much we fight or argue, always remember that I love you, and I will never love anyone as much as I love you. I love you so much, Rose, and a little more romantic words from me: You are my everything, and I can't imagine my life without you. <b style="color: red;">Happy Valentine's Day</b></p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>This site was made with love by your favorite software engineer</p>
+    </div>
+
+    <script>
+        // Dynamic Text
+        const texts = ["Forever with you ", "You complete me ", "Endless true love"];
+        let index = 0;
+        const dynamicText = document.getElementById('dynamicText');
+
+        setInterval(() => {
+            dynamicText.textContent = texts[index];
+            index = (index + 1) % texts.length;
+        }, 3000);
+
+        // تشغيل الصوت عند الضغط على الزر
+        const playButton = document.getElementById('playButton');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+
+        playButton.addEventListener('click', () => {
+            if (backgroundMusic.paused) {
+                backgroundMusic.play();
+                playButton.innerHTML = '<i class="fas fa-pause"></i><p>My Message</p>'; // تغيير الأيقونة إلى Pause
+            } else {
+                backgroundMusic.pause();
+                playButton.innerHTML = '<i class="fas fa-play"></i><p>My Message</p>';
+            }
+        });
+
+        // Popup Functionality
+        const messageIcon = document.getElementById('messageIcon');
+        const popup = document.getElementById('popup');
+        const overlay = document.getElementById('overlay');
+        const closeBtn = document.getElementById('closeBtn');
+
+        messageIcon.addEventListener('click', () => {
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+        });
+
+        closeBtn.addEventListener('click', () => {
+            popup.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+
+        overlay.addEventListener('click', () => {
+            popup.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
